@@ -1,7 +1,8 @@
 #include <stdlib.h>
 #include <assert.h>
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <time.h>
+#include <stdio.h>
 #include "sim.h"
 
 #define FRAME_TICKS 50

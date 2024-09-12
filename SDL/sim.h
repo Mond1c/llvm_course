@@ -1,5 +1,5 @@
-#define SIM_X_SIZE 512
-#define SIM_Y_SIZE 256
+#define SIM_X_SIZE 1000
+#define SIM_Y_SIZE 800
 
 #ifndef __sim__
 void simFlush();
