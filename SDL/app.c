@@ -1,7 +1,7 @@
 #include "sim.h"
 #include <stdio.h>
 
-#define CELL_SIZE 2
+#define CELL_SIZE 1
 #define BOARD_Y_SIZE SIM_Y_SIZE / CELL_SIZE
 #define BOARD_X_SIZE SIM_X_SIZE / CELL_SIZE
 
