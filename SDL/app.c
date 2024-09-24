@@ -59,13 +59,24 @@ void app() {
 
   init_zero_frame(board_last);
 
-  while (1) {
+  int running = 1;
+  int is_not_empty_board = 1;
+
+  while (running && is_not_empty_board) {
     
     calculate_and_draw_frame(board_last, board);
     simFlush();
 
+    running = 0;
+    is_not_empty_board = 0;
     for (int y = 0; y < SIM_Y_SIZE; ++y) {
       for (int x = 0; x < SIM_X_SIZE; ++x) {
+        if (board_last[y][x] != board[y][x]) {
+          running = 1;
+        }
+        if (board[y][x] != 0) {
+          is_not_empty_board = 1;
+        }
         board_last[y][x] = board[y][x];
       }
     }
