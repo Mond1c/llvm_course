@@ -13,6 +13,10 @@ using namespace llvm;
 struct InstructionTracerModPass : public PassInfoMixin<InstructionTracerModPass> {
     PreservedAnalyses run(Module& M, ModuleAnalysisManager &AM) {
         outs() << "[Module] " << M.getName() << "\n";
+        if (M.getName().find("app.c") == std::string::npos) {
+            outs() << "SKIPPED" << "\n";
+            return PreservedAnalyses::all();
+        }
         std::unordered_map<std::string, int> stats;
         
         for (auto& F : M) {

@@ -34,18 +34,17 @@ add_custom_command(
 add_custom_command(
     OUTPUT app_with_pass
     COMMAND ${CMAKE_C_COMPILER}
-    ARGS -fpass-plugin=${PASS_PLUGIN_PATH} -O2 ${CMAKE_SOURCE_DIR}/SDL/app.c -o ${CMAKE_BINARY_DIR}/app_with_pass
+    ARGS -fpass-plugin=${PASS_PLUGIN_PATH} -O2 ${CMAKE_SOURCE_DIR}/SDL/app.c ${CMAKE_SOURCE_DIR}/SDL/sim.c ${CMAKE_SOURCE_DIR}/SDL/start.c -I/usr/include/SDL2  -lSDL2 -o ${CMAKE_BINARY_DIR}/app_with_pass
     DEPENDS ${SOURCE_FILES} ${PASS_PLUGIN_PATH}
     COMMENT "Building SDL app with LLVM pass"
 )
 
 # Custom target to trigger the build of the app with the pass
-add_custom_target(build_with_pass ALL DEPENDS app_with_pass)
+add_custom_target(build_with_pass ALL DEPENDS app_with_pass VERBATIM)
 
 # Optionally: show a message after the build
 add_custom_command(
     TARGET build_with_pass
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E echo "Run your app with the pass: ./app_with_pass"
-    COMMENT "Finished building app with LLVM pass plugin"
+    PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E touch ${PASS_PLUGIN_PATH}
 )
