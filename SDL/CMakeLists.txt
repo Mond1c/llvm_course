@@ -1,10 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 project(SDL)
 
-set(CMAKE_C_COMPILER clang)
-set(CMAKE_CXX_COMPILER clang++)
-set(CMAKE_C_STANDARD 11)
-
 find_package(SDL2 REQUIRED)
 
 set(SOLUTION_FILE app.c)
