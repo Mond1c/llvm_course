@@ -15,6 +15,6 @@ add_custom_command(
 
 add_custom_target(generate-llvm-ir ALL DEPENDS ${SOURCE_DIR}/${SOLUTION_FILE}.ll)
 
-add_executable(app sim.c ${SOLUTION_FILE} start.c)
+add_executable(app sim.c ${SOLUTION_FILE} start.c utils.c)
 
 target_link_libraries(app PRIVATE SDL2::SDL2)

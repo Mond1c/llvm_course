@@ -15,7 +15,8 @@ add_definitions(${LLVM_DEFINITIONS})
 
 set(SOURCE_FILES SDL/app.c)
 
-add_executable(app_normal ${SOURCE_FILES} SDL/sim.c SDL/start.c)
+add_executable(app_normal ${SOURCE_FILES} SDL/sim.c SDL/start.c SDL/utils.c)
+add_executable(stats llvm_pass/stats_getter.cpp)
 
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
@@ -34,15 +35,13 @@ add_custom_command(
 add_custom_command(
     OUTPUT app_with_pass
     COMMAND ${CMAKE_C_COMPILER}
-    ARGS -fpass-plugin=${PASS_PLUGIN_PATH} -O2 ${CMAKE_SOURCE_DIR}/SDL/app.c ${CMAKE_SOURCE_DIR}/SDL/sim.c ${CMAKE_SOURCE_DIR}/SDL/start.c -I/usr/include/SDL2  -lSDL2 -o ${CMAKE_BINARY_DIR}/app_with_pass
+    ARGS -fpass-plugin=${PASS_PLUGIN_PATH} -O2 ${CMAKE_SOURCE_DIR}/SDL/app.c ${CMAKE_SOURCE_DIR}/SDL/sim.c ${CMAKE_SOURCE_DIR}/SDL/start.c ${CMAKE_SOURCE_DIR}/SDL/utils.c -I/usr/include/SDL2  -lSDL2 -o ${CMAKE_BINARY_DIR}/app_with_pass
     DEPENDS ${SOURCE_FILES} ${PASS_PLUGIN_PATH}
     COMMENT "Building SDL app with LLVM pass"
 )
 
-# Custom target to trigger the build of the app with the pass
 add_custom_target(build_with_pass ALL DEPENDS app_with_pass VERBATIM)
 
-# Optionally: show a message after the build
 add_custom_command(
     TARGET build_with_pass
     PRE_BUILD
