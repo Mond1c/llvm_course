@@ -34,3 +34,35 @@ void logInstruction(const char* instruction) {
         printf("[INSTRUCTION LOGGING] COUNT: %d\n", logCount);
     }
 }
+
+static char logBuffer2[LOG_BUFFER_SIZE];
+static int logBufferIndex2 = 0;
+static int logCount2 = 0;
+
+void logUsageInstruction(const char* instruction) {
+    if (logCount2 >= MAX_LOGS) {
+        return;
+    }
+
+    int len = strlen(instruction);
+
+    if (logBufferIndex2 + len + 1 >= LOG_BUFFER_SIZE) {
+        FILE *logFile = fopen("instructions_uses.log", "a");
+        if (logFile != NULL) {
+            fwrite(logBuffer2, 1, logBufferIndex2, logFile);
+            fclose(logFile);
+        }
+        logBufferIndex2 = 0;
+    }
+
+    strcpy(&logBuffer2[logBufferIndex2], instruction);
+    logBufferIndex2 += len;
+
+    logBuffer2[logBufferIndex2++] = '\n';
+    logCount2++;
+
+    if (logCount2 % 1000 == 0) {
+        printf("[INSTRUCTION LOGGING] COUNT: %d\n", logCount2);
+    }
+}
+

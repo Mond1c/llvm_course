@@ -8,7 +8,7 @@
 const int MAX_PATTERN_LENGTH = 5;
 const int MIN_PATTERN_FREQ = 4;
 
-void get_stat(const std::string& inputFile, const std::string& outputFile) {
+void get_stat(const std::string& inputFile, const std::string& outputFile, bool pattern_enable = true) {
     std::ifstream input(inputFile);
     std::ofstream output(outputFile);
 
@@ -36,16 +36,18 @@ void get_stat(const std::string& inputFile, const std::string& outputFile) {
             std::cout << "[LOG] COUNT: " << count << "\n";
         }
         stats[instruction]++;
-        if (instructions.size() == MAX_PATTERN_LENGTH) {
-            instructions.pop_front();
-        }
-        instructions.push_back(instruction);
-        for (std::size_t len = 1; len <= MAX_PATTERN_LENGTH && len <= instruction.size(); ++len) {
-            std::string pattern;
-            for (int i = instructions.size() - len; i < instructions.size(); i++) {
-                pattern += instructions[i] + (i == instructions.size() - 1 ? "" : " ");
+        if (pattern_enable) {
+            if (instructions.size() == MAX_PATTERN_LENGTH) {
+                instructions.pop_front();
             }
-            patterns[pattern]++;
+            instructions.push_back(instruction);
+            for (std::size_t len = 1; len <= MAX_PATTERN_LENGTH && len <= instruction.size(); ++len) {
+                std::string pattern;
+                for (int i = instructions.size() - len; i < instructions.size(); i++) {
+                    pattern += instructions[i] + (i == instructions.size() - 1 ? "" : " ");
+                }
+                patterns[pattern]++;
+            }
         }
         ++count;
     }
@@ -57,19 +59,22 @@ void get_stat(const std::string& inputFile, const std::string& outputFile) {
 
     output << "[INSTRUCTIONS STATS]\n";
     for (const auto& item : s) {
+        if (item.first.empty()) continue;
         output << item.first << ": " << item.second << "\n";
     }
 
-    std::vector<std::pair<std::string, std::size_t>> p(patterns.begin(), patterns.end());
-    std::sort(p.begin(), p.end(), [](const auto& lhs, const auto& rhs) {
-        return lhs.second > rhs.second;
-    });
-    
-    output << "[PATTERNS STATS]\n";
-    for (const auto& item : p) {
-        std::cout << item.second << std::endl;
-        if (item.second < MIN_PATTERN_FREQ) break;
-        output << item.first << ": " << item.second << "\n";
+    if (pattern_enable) {
+        std::vector<std::pair<std::string, std::size_t>> p(patterns.begin(), patterns.end());
+        std::sort(p.begin(), p.end(), [](const auto& lhs, const auto& rhs) {
+            return lhs.second > rhs.second;
+        });
+        
+        output << "[PATTERNS STATS]\n";
+        for (const auto& item : p) {
+            if (item.second < MIN_PATTERN_FREQ) break;
+            if (item.first.empty()) continue;
+            output << item.first << ": " << item.second << "\n";
+        }
     }
 
     input.close();
@@ -86,5 +91,6 @@ void get_stat(const std::string& inputFile, const std::string& outputFile) {
 
 int main() {
     get_stat("instructions.log", "stats_output.txt");
+    get_stat("instructions_uses.log", "stats_uses_output.txt", false);
     return 0;
 }
