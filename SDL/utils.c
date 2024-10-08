@@ -4,65 +4,46 @@
 #define LOG_BUFFER_SIZE 8192
 #define MAX_LOGS 1000000
 
-static char logBuffer[LOG_BUFFER_SIZE];
-static int logBufferIndex = 0;
-static int logCount = 0;
+typedef struct {
+    char buffer[LOG_BUFFER_SIZE];
+    int bufferIndex;
+    int logCount;
+    const char* filename;
+} LogData;
+
+void logInstructionInternal(LogData *logData, const char* instruction) {
+    if (logData->logCount >= MAX_LOGS) {
+        return;
+    }
+
+    int len = strlen(instruction);
+
+    if (logData->bufferIndex + len + 1 >= LOG_BUFFER_SIZE) {
+        FILE *logFile = fopen(logData->filename, "a");
+        if (logFile != NULL) {
+            fwrite(logData->buffer, 1, logData->bufferIndex, logFile);
+            fclose(logFile);
+        }
+        logData->bufferIndex = 0;
+    }
+
+    strcpy(&logData->buffer[logData->bufferIndex], instruction);
+    logData->bufferIndex += len;
+
+    logData->buffer[logData->bufferIndex++] = '\n';
+    logData->logCount++;
+
+    if (logData->logCount % 1000 == 0) {
+        printf("[INSTRUCTION LOGGING] COUNT: %d\n", logData->logCount);
+    }
+}
 
 void logInstruction(const char* instruction) {
-    if (logCount >= MAX_LOGS) {
-        return;
-    }
-
-    int len = strlen(instruction);
-
-    if (logBufferIndex + len + 1 >= LOG_BUFFER_SIZE) {
-        FILE *logFile = fopen("instructions.log", "a");
-        if (logFile != NULL) {
-            fwrite(logBuffer, 1, logBufferIndex, logFile);
-            fclose(logFile);
-        }
-        logBufferIndex = 0;
-    }
-
-    strcpy(&logBuffer[logBufferIndex], instruction);
-    logBufferIndex += len;
-
-    logBuffer[logBufferIndex++] = '\n';
-    logCount++;
-
-    if (logCount % 1000 == 0) {
-        printf("[INSTRUCTION LOGGING] COUNT: %d\n", logCount);
-    }
+    static LogData instructionLog = { .bufferIndex = 0, .logCount = 0, .filename = "instructions.log" };
+    logInstructionInternal(&instructionLog, instruction);
 }
-
-static char logBuffer2[LOG_BUFFER_SIZE];
-static int logBufferIndex2 = 0;
-static int logCount2 = 0;
 
 void logUsageInstruction(const char* instruction) {
-    if (logCount2 >= MAX_LOGS) {
-        return;
-    }
-
-    int len = strlen(instruction);
-
-    if (logBufferIndex2 + len + 1 >= LOG_BUFFER_SIZE) {
-        FILE *logFile = fopen("instructions_uses.log", "a");
-        if (logFile != NULL) {
-            fwrite(logBuffer2, 1, logBufferIndex2, logFile);
-            fclose(logFile);
-        }
-        logBufferIndex2 = 0;
-    }
-
-    strcpy(&logBuffer2[logBufferIndex2], instruction);
-    logBufferIndex2 += len;
-
-    logBuffer2[logBufferIndex2++] = '\n';
-    logCount2++;
-
-    if (logCount2 % 1000 == 0) {
-        printf("[INSTRUCTION LOGGING] COUNT: %d\n", logCount2);
-    }
+    static LogData usageLog = { .bufferIndex = 0, .logCount = 0, .filename = "instructions_uses.log" };
+    logInstructionInternal(&usageLog, instruction);
 }
-
